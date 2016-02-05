@@ -43,7 +43,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       )
     )
   ),
-  absolutePanel(id="controls", bottom=10, left=10,
+  absolutePanel(bottom=10, left=10,
     checkboxInput("deltas", "Display deltas", TRUE),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
