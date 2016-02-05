@@ -34,8 +34,8 @@ shinyServer(function(input, output, session) {
 
     mung_stats <- function(x, mon_or_sea, mo, dec, mo2, f_sea, f_stat, statid){
       if(mon_or_sea=="Seasonal") mo <- mo2
-      x <- x %>% do(., Data=.$Data[[1]][mo] %>% purrr::map(~subset(.x, dec)) %>% brick %>% calc(f_sea))
-      x <- f_stat(brick(x$Data))
+      x <- x %>% do(., Maps=.$Maps[[1]][mo] %>% purrr::map(~subset(.x, dec)) %>% brick %>% calc(f_sea))
+      x <- f_stat(brick(x$Maps))
       if(statid=="Spread") x <- calc(x, function(x) x[2]-x[1])
       round(x, 1)
     }
@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
     }
 
     if(input$mod_or_stat=="Single GCM"){
-      x <- filter(d, Var==Variable() & RCP==input$rcp & Model==input$model)$Data[[1]]
+      x <- filter(d, Var==Variable() & RCP==input$rcp & Model==input$model)$Maps[[1]]
       x <- mung_models(x, input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func)
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
