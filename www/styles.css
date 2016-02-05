@@ -1,4 +1,4 @@
-div.outer {
+.outer {
   position: fixed;
   top: 41px;
   left: 0;
@@ -10,11 +10,11 @@ div.outer {
 
 #controls {
   /* Appearance */
-  background-color: white;
+  background-color: transparent;
   padding: 0 20px 20px 20px;
   cursor: move;
   /* Fade out while not hovering */
-  opacity: 0.65;
+  opacity: 0.6;
   zoom: 0.9;
   transition: opacity 500ms 1s;
 }

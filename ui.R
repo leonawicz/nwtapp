@@ -8,7 +8,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
   div(class="outer",
   tags$head(includeCSS("www/styles.css")),
   leafletOutput("Map", width="100%", height="100%"),
-  absolutePanel(top=10, right=10, height=300, width=300,
+  absolutePanel(id="controls", top=10, right=10, height=300, width=300,
     sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=decades[1], step=10, sep="", post="s"),
     fluidRow(
       column(6,
@@ -23,7 +23,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     ),
     selectInput("variable", "Variable", var.labels, var.labels[1])
   ),
-  absolutePanel(top=350, right=10, height=300, width=300, draggable=TRUE,
+  absolutePanel(id="controls", top=350, right=10, height=300, width=300, draggable=TRUE,
     conditionalPanel("input.show_colpal == true",
       wellPanel(
         fluidRow(
@@ -43,7 +43,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       )
     )
   ),
-  absolutePanel(bottom=10, left=10,
+  absolutePanel(id="controls", bottom=10, left=10,
     checkboxInput("deltas", "Display deltas", TRUE),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
