@@ -33,21 +33,23 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     fluidRow(
       column(6,
         selectInput("mon_or_sea", "Time of year", c("Monthly", "Seasonal"), "Monthly"),
-        selectInput("rcp", "RCP", rcps, rcps[1])
+        selectInput("variable", "Variable", var.labels, var.labels[1]),
+        selectInput("mod_or_stat", "GCM data", c("Single GCM", "Statistic"), "Single GCM")
       ),
       column(6,
         conditionalPanel("input.mon_or_sea == 'Monthly'", selectInput("mon", "Month", month.abb, month.abb[1])),
         conditionalPanel("input.mon_or_sea == 'Seasonal'", selectInput("sea", "Season", season.labels, season.labels[1])),
-        selectInput("model", "Model", models, models[1])
+        selectInput("rcp", "RCP", rcps, rcps[1]),
+        conditionalPanel("input.mod_or_stat == 'Single GCM'", selectInput("model", "Model", models, models[1])),
+        conditionalPanel("input.mod_or_stat == 'Statistic'", selectInput("model_stats", "Stat", c("Mean", "Min", "Max", "Spread"), "Mean"))
       )
-    ),
-    selectInput("variable", "Variable", var.labels, var.labels[1])
+    )
   ),
   absolutePanel(id="controls", top=20, left=0, height=300, width=300,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
-    checkboxInput("deltas", "Display deltas", FALSE),
+    conditionalPanel("input.mod_or_stat == 'Single GCM'", checkboxInput("deltas", "Display deltas", FALSE)),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
   )
