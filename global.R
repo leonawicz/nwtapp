@@ -8,6 +8,7 @@ library(dplyr)
 library(tidyr)
 
 load("nwt_data_pr_tas_monthly_decadal_means_2010_2099.Rdata")
+load("nwt_data_pr_tas_CRU32_1961_1990_climatology.RData")
 
 r <- subset(d$Data[[1]][[1]], 1)
 lon <- (xmin(r)+xmax(r))/2
