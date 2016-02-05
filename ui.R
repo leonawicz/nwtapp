@@ -15,9 +15,9 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
           column(6,
             conditionalPanel("(input.colpal_type == 'Divergent' && input.colpal_div == 'Custom') ||
                              (input.colpal_type == 'Sequential' && input.colpal_seq == 'Custom')",
-              colourInput("col_low", "Low", value = "#0C2C84"),
-              conditionalPanel("input.colpal_type == 'Divergent'", colourInput("col_med", "Med", value = "#41B6C4")),
-              colourInput("col_high", "High", value = "#FFFFCC"))
+              colourInput("col_low", "Low", value = "#8C0050"),
+              conditionalPanel("input.colpal_type == 'Divergent'", colourInput("col_med", "Med", value = "#CEEBF0")),
+              colourInput("col_high", "High", value = "#000470"))
           ),
           column(6,
             selectInput("colpal_type", "Style", c("Divergent", "Sequential"), "Divergent"),
@@ -45,7 +45,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       )
     )
   ),
-  absolutePanel(id="controls", top=20, left=0, height=300, width=300,
+  absolutePanel(id="controls", top=20, left=0, height=300, width=300, draggable=TRUE,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
