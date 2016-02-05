@@ -3,6 +3,7 @@ colpals <- RColorBrewer::brewer.pal.info
 
 shinyServer(function(input, output, session) {
 
+  # setup
   mon_index <- reactive({ match(input$mon, month.abb) })
   time_of_year <- reactive({ if(input$mon_or_sea=="Monthly") input$mon else input$sea })
 
@@ -13,6 +14,7 @@ shinyServer(function(input, output, session) {
     subset(cru6190[[Variable()]], idx)
   })
 
+  # prepping GCM/CRU, raw/deltas, months/seasons, models/stats, temp/precip
   ras <- reactive({
     dec.idx <- which(decades==input$dec)
     mon.idx <- switch(time_of_year(), Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
@@ -58,8 +60,10 @@ shinyServer(function(input, output, session) {
     x
   })
 
+  # store raster values once, separate from raster object
   ras_vals <- reactive({ values(ras()) })
 
+  # Colors and color palettes
   output$Colpal_div_options <- renderUI({
     pals <- c("Custom", rownames(colpals)[colpals["category"]=="div"])
     selectInput("colpal_div", "Palette", pals, pals[1])
@@ -83,22 +87,25 @@ shinyServer(function(input, output, session) {
     colorNumeric(Colors(), ras_vals(), na.color="transparent")
   })
 
+  # Map legend title, also used for spatial summary density plot
   Legend_Title <- reactive({
     p <- input$variable=="Precipitation"
     d <- input$deltas
     if(p & d) "Precip. deltas" else if(p) "Precipitation (mm)" else if(!p & d) "Temp. deltas (C)" else "Temperature (C)"
   })
 
+  # Initialize map
   output$Map <- renderLeaflet({
     leaflet() %>% setView(lon, lat, 4) %>% addTiles()
   })
 
-  observe({
+  #### Map-related observers ####
+  observe({ # raster layers
     proxy <- leafletProxy("Map")
     proxy %>% removeTiles(layerId="rasimg") %>% addRasterImage(ras(), colors=pal(), opacity=0.8, layerId="rasimg")
   })
 
-  observe({
+  observe({ # legend
     proxy <- leafletProxy("Map")
     proxy %>% clearControls()
     if (input$legend) {
@@ -106,6 +113,55 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  observe({ # show or hide location markers
+    proxy <- leafletProxy("Map")
+    if (input$show_communities) {
+      proxy %>% showGroup("locations")
+    } else {
+      proxy %>% hideGroup("locations") %>% removeMarker(layerId="Selected")
+    }
+  })
+
+  observeEvent(input$Map_marker_click, { # update the map markers and view on map clicks
+    p <- input$Map_marker_click
+    proxy <- leafletProxy("Map")
+    if(p$id=="Selected"){
+      proxy %>% removeMarker(layerId="Selected")
+    } else {
+      proxy %>% setView(lng=p$lng, lat=p$lat, input$Map_zoom) %>% addCircleMarkers(p$lng, p$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p)
+    }
+  })
+
+  observeEvent(input$Map_marker_click, { # update the location selectInput on map clicks
+    p <- input$Map_marker_click
+    if(!is.null(p$id)){
+      if(is.null(input$location) || input$location!=p$id) updateSelectInput(session, "location", selected=p$id)
+    }
+  })
+
+  observeEvent(input$location, { # update the map markers and view on location selectInput changes
+    p <- input$Map_marker_click
+    p2 <- subset(locs, loc==input$location)
+    proxy <- leafletProxy("Map")
+    if(nrow(p2)==0){
+      proxy %>% removeMarker(layerId="Selected")
+    } else if(input$location!=p$id){
+      proxy %>% setView(lng=p2$lon, lat=p2$lat, input$Map_zoom) %>% addCircleMarkers(p2$lon, p2$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p2)
+    }
+  })
+  #### END Map-related observers ####
+
+  # Location data
+  Data <- reactive({ d <- d.cru$Locs[[2]] %>% filter(Location==input$location & Month=="Jun") })
+
+  # Outputs for location modal
+  output$TestPlot <- renderPlot({ ggplot(Data(), aes(value, Year)) + geom_line() + geom_smooth() })
+
+  output$TestTable <- renderDataTable({
+    Data()
+  }, options = list(pageLength=5))
+
+  # Spatial distribution density plot
   output$sp_density_plot <- renderPlot({
     x <- ras_vals()
     x <- data.table(`Spatial Distribution`=x[!is.na(x)])
@@ -113,7 +169,7 @@ shinyServer(function(input, output, session) {
     ggplot(x, aes(`Spatial Distribution`)) + geom_density(fill="#33333350") + tp_theme + labs(x=Legend_Title())
   }, width=300, height=300, bg="transparent")
 
-  observe({
+  observe({ # no deltas allowed when comparing across models
     if(input$mod_or_stat=="Statistic"){
       updateCheckboxInput(session, "deltas", value=FALSE)
     }
