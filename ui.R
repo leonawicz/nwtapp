@@ -8,7 +8,27 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
   div(class="outer",
   tags$head(includeCSS("www/styles.css")),
   leafletOutput("Map", width="100%", height="100%"),
-  absolutePanel(id="controls", top=10, right=10, height=300, width=300,
+  absolutePanel(id="controls", top=360, right=0, height=300, width=300,
+    conditionalPanel("input.show_colpal == true",
+      wellPanel(
+        fluidRow(
+          column(6,
+            conditionalPanel("(input.colpal_type == 'Divergent' && input.colpal_div == 'Custom') ||
+                             (input.colpal_type == 'Sequential' && input.colpal_seq == 'Custom')",
+              colourInput("col_low", "Low", value = "#0C2C84"),
+              conditionalPanel("input.colpal_type == 'Divergent'", colourInput("col_med", "Med", value = "#41B6C4")),
+              colourInput("col_high", "High", value = "#FFFFCC"))
+          ),
+          column(6,
+            selectInput("colpal_type", "Style", c("Divergent", "Sequential"), "Divergent"),
+            conditionalPanel("input.colpal_type == 'Divergent'", uiOutput("Colpal_div_options")),
+            conditionalPanel("input.colpal_type == 'Sequential'", uiOutput("Colpal_seq_options"))
+          )
+        )
+      )
+    )
+  ),
+  absolutePanel(id="controls", top=20, right=0, height=300, width=300,
     sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=decades[1], step=10, sep="", post="s"),
     fluidRow(
       column(6,
@@ -23,28 +43,11 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     ),
     selectInput("variable", "Variable", var.labels, var.labels[1])
   ),
-  absolutePanel(id="controls", top=350, right=10, height=300, width=300, draggable=TRUE,
-    conditionalPanel("input.show_colpal == true",
-      wellPanel(
-        fluidRow(
-          column(6,
-          conditionalPanel("(input.colpal_type == 'Divergent' && input.colpal_div == 'Custom') ||
-                           (input.colpal_type == 'Sequential' && input.colpal_seq == 'Custom')",
-            colourInput("col_low", "Low", value = "#0C2C84"),
-            conditionalPanel("input.colpal_type == 'Divergent'", colourInput("col_med", "Med", value = "#41B6C4")),
-            colourInput("col_high", "High", value = "#FFFFCC"))
-          ),
-          column(6,
-            selectInput("colpal_type", "Style", c("Divergent", "Sequential"), "Divergent"),
-            conditionalPanel("input.colpal_type == 'Divergent'", uiOutput("Colpal_div_options")),
-            conditionalPanel("input.colpal_type == 'Sequential'", uiOutput("Colpal_seq_options"))
-          )
-        )
-      )
-    )
+  absolutePanel(id="controls", top=20, left=0, height=300, width=300,
+    plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
-    checkboxInput("deltas", "Display deltas", TRUE),
+    checkboxInput("deltas", "Display deltas", FALSE),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
   )
