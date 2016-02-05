@@ -1,7 +1,14 @@
-shinyUI(bootstrapPage(
-  tags$style(type="text/css", "html, body {width:100%;height:100%}"),
+shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
+  #tags$style(type="text/css", "html, body {width:100%;height:100%}"),
+  title=HTML('<div><a href="http://snap.uaf.edu" target="_blank"><img src="./img/SNAP_acronym_100px.png" width="100%"></a></div>'),
+  windowTitle="NWT",
+  collapsible=TRUE,
+  id="nb",
+  tabPanel("NWT Projections", value="vis",
+  div(class="outer",
+  tags$head(includeCSS("www/styles.css")),
   leafletOutput("Map", width="100%", height="100%"),
-  absolutePanel(top=10, right=10, width=300,
+  absolutePanel(top=10, right=10, height=300, width=300,
     sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=decades[1], step=10, sep="", post="s"),
     fluidRow(
       column(6,
@@ -14,7 +21,9 @@ shinyUI(bootstrapPage(
         selectInput("model", "Model", models, models[1])
       )
     ),
-    selectInput("variable", "Variable", var.labels, var.labels[1]),
+    selectInput("variable", "Variable", var.labels, var.labels[1])
+  ),
+  absolutePanel(top=350, right=10, height=300, width=300, draggable=TRUE,
     conditionalPanel("input.show_colpal == true",
       wellPanel(
         fluidRow(
@@ -39,4 +48,7 @@ shinyUI(bootstrapPage(
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
   )
+  )
+  ),
+  tabPanel("About", value="about")
 ))
