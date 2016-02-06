@@ -96,7 +96,8 @@ shinyServer(function(input, output, session) {
 
   # Initialize map
   output$Map <- renderLeaflet({
-    leaflet() %>% setView(lon, lat, 4) %>% addTiles()
+    leaflet() %>% setView(lon, lat, 4) %>% addTiles() %>%
+      addCircleMarkers(data=locs, radius = ~10, color= ~"#000000", stroke=FALSE, fillOpacity=0.5, group="locations", layerId = ~loc)
   })
 
   #### Map-related observers ####
@@ -145,7 +146,9 @@ shinyServer(function(input, output, session) {
     proxy <- leafletProxy("Map")
     if(nrow(p2)==0){
       proxy %>% removeMarker(layerId="Selected")
-    } else if(input$location!=p$id){
+    } else if(length(p$id) && input$location!=p$id){
+      proxy %>% setView(lng=p2$lon, lat=p2$lat, input$Map_zoom) %>% addCircleMarkers(p2$lon, p2$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p2)
+    } else if(!length(p$id)){
       proxy %>% setView(lng=p2$lon, lat=p2$lat, input$Map_zoom) %>% addCircleMarkers(p2$lon, p2$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p2)
     }
   })
