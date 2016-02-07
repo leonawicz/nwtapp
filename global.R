@@ -22,6 +22,9 @@ lon <- (xmin(r)+xmax(r))/2
 lat <- (ymin(r)+ymax(r))/2
 decades <- seq(2010, 2090, by=10)
 season.labels <- names(cru6190[[1]])[13:16]
+season.labels.long <- season.labels[c(1,1,2,2,2,3,3,3,4,4,4,1)]
+sea.idx <- list(Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
+toy_list <- list(Season=season.labels, Month=month.abb)
 rcps <- unique(d$RCP)
 models <- unique(d$Model)
 vars <- sort(unique(d$Var))
