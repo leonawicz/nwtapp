@@ -4,8 +4,9 @@ colpals <- RColorBrewer::brewer.pal.info
 shinyServer(function(input, output, session) {
 
   # setup
-  mon_index <- reactive({ match(input$mon, month.abb) })
-  time_of_year <- reactive({ if(input$mon_or_sea=="Monthly") input$mon else input$sea })
+  Monthly <- reactive({ input$toy %in% month.abb })
+  Mos <- reactive({ if(Monthly()) input$toy else month.abb[sea.idx[[input$toy]]] })
+  mon_index <- reactive({ match(Mos(), month.abb) })
 
   Variable <- reactive({ vars[var.labels==input$variable] })
 
@@ -19,25 +20,25 @@ shinyServer(function(input, output, session) {
   })
 
   CRU_ras <- reactive({
-    idx <- match(time_of_year(), names(cru6190[[Variable()]]))
+    idx <- match(input$toy, names(cru6190[[Variable()]]))
     subset(cru6190[[Variable()]], idx)
   })
 
   # prepping GCM/CRU, raw/deltas, months/seasons, models/stats, temp/precip
   ras <- reactive({
     dec.idx <- which(decades==input$dec)
-    mon.idx <- switch(time_of_year(), Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
+    mon.idx <- switch(input$toy, Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
 
-    mung_models <- function(x, mon_or_sea, mo, dec, mo2, f_sea){
-      if(mon_or_sea=="Monthly"){
+    mung_models <- function(x, monthly, mo, dec, mo2, f_sea){
+      if(monthly){
         x[[mo]] %>% subset(dec)
       } else {
         calc(brick(lapply(x[mo2], function(x, idx) subset(x, idx), idx=dec)), f_sea) %>% round(1)
       }
     }
 
-    mung_stats <- function(x, mon_or_sea, mo, dec, mo2, f_sea, f_stat, statid){
-      if(mon_or_sea=="Seasonal") mo <- mo2
+    mung_stats <- function(x, monthly, mo, dec, mo2, f_sea, f_stat, statid){
+      if(!monthly) mo <- mo2
       x <- x %>% do(., Maps=.$Maps[[1]][mo] %>% purrr::map(~subset(.x, dec)) %>% brick %>% calc(f_sea))
       x <- f_stat(brick(x$Maps))
       if(statid=="Spread") x <- calc(x, function(x) x[2]-x[1])
@@ -46,13 +47,13 @@ shinyServer(function(input, output, session) {
 
     if(input$mod_or_stat=="Statistic"){
       x <- filter(d, Var==Variable() & RCP==RCPs()) %>% group_by(Model, add=T) %>%
-        mung_stats(input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), input$model_stats)
+        mung_stats(Monthly(), mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), input$model_stats)
       return(x)
     }
 
     if(input$mod_or_stat=="Single GCM"){
       x <- filter(d, Var==Variable() & RCP==RCPs() & Model==input$model)$Maps[[1]]
-      x <- mung_models(x, input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func())
+      x <- mung_models(x, Monthly(), mon_index(), dec.idx, mon.idx, sea_func())
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
         x[is.infinite(x)] <- NA

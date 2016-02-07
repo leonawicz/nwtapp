@@ -59,7 +59,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=decades[1], step=10, sep="", post="s"),
     fluidRow(
       column(6,
-        selectInput("mon_or_sea", "Time of year", c("Monthly", "Seasonal"), "Monthly"),
+        selectInput("toy", "", toy_list, toy_list[[1]][1]),
         selectInput("variable", "Variable", var.labels, var.labels[1]),
         selectInput("mod_or_stat", "GCM data", c("Single GCM", "Statistic"), "Single GCM")
       ),
