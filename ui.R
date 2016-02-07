@@ -64,8 +64,6 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
         selectInput("mod_or_stat", "GCM data", c("Single GCM", "Statistic"), "Single GCM")
       ),
       column(6,
-        conditionalPanel("input.mon_or_sea == 'Monthly'", selectInput("mon", "Month", month.abb, month.abb[1])),
-        conditionalPanel("input.mon_or_sea == 'Seasonal'", selectInput("sea", "Season", season.labels, season.labels[1])),
         selectInput("rcp", "RCP", rcp.labels, rcp.labels[1]),
         conditionalPanel("input.mod_or_stat == 'Single GCM'", selectInput("model", "Model", models, models[1])),
         conditionalPanel("input.mod_or_stat == 'Statistic'", selectInput("model_stats", "Stat", c("Mean", "Min", "Max", "Spread"), "Mean"))
