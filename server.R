@@ -7,7 +7,14 @@ shinyServer(function(input, output, session) {
   mon_index <- reactive({ match(input$mon, month.abb) })
   time_of_year <- reactive({ if(input$mon_or_sea=="Monthly") input$mon else input$sea })
 
-  Variable <- reactive({ vars[which(var.labels==input$variable)] })
+  Variable <- reactive({ vars[var.labels==input$variable] })
+
+  sea_func <- reactive({ if(Variable()=="pr") sum else mean })
+
+  stat_func <- reactive({
+      switch(input$model_stats,
+    Mean=mean,  Min=function(x,...) min(x,...), Max=function(x,...) max(x,...), Spread=function(x,...) range(x,...))
+  })
 
   CRU_ras <- reactive({
     idx <- match(time_of_year(), names(cru6190[[Variable()]]))
@@ -18,11 +25,6 @@ shinyServer(function(input, output, session) {
   ras <- reactive({
     dec.idx <- which(decades==input$dec)
     mon.idx <- switch(time_of_year(), Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
-    sea_func <- if(Variable()=="pr") sum else mean
-    stat_func <- switch(input$model_stats, Mean=mean,
-                        Min=function(x,...) min(x,...),
-                        Max=function(x,...) max(x,...),
-                        Spread=function(x,...) range(x,...))
 
     mung_models <- function(x, mon_or_sea, mo, dec, mo2, f_sea){
       if(mon_or_sea=="Monthly"){
@@ -42,13 +44,13 @@ shinyServer(function(input, output, session) {
 
     if(input$mod_or_stat=="Statistic"){
       x <- filter(d, Var==Variable() & RCP==input$rcp) %>% group_by(Model, add=T) %>%
-        mung_stats(input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func, stat_func, input$model_stats)
+        mung_stats(input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), input$model_stats)
       return(x)
     }
 
     if(input$mod_or_stat=="Single GCM"){
       x <- filter(d, Var==Variable() & RCP==input$rcp & Model==input$model)$Maps[[1]]
-      x <- mung_models(x, input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func)
+      x <- mung_models(x, input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func())
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
         x[is.infinite(x)] <- NA
@@ -155,13 +157,49 @@ shinyServer(function(input, output, session) {
   #### END Map-related observers ####
 
   # Location data
-  Data <- reactive({ d <- d.cru$Locs[[2]] %>% filter(Location==input$location & Month=="Jun") })
+  Loc_Var <- reactive({ vars[var.labels==input$loc_variable] })
+
+  Data <- reactive({
+    x <- select(d, Var, RCP, Model, Locs) %>% group_by(RCP, Model, Var) %>%
+      filter(Var==Loc_Var() & RCP==input$loc_rcp) %>%
+      do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest
+
+    x <- group_by(d.cru, Var) %>% do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest %>%
+      filter(Var==Loc_Var()) %>% mutate(RCP="historical", Model="CRU 3.2") %>% bind_rows(x) %>%
+      select(Location, Var, RCP, Model, Year, Month, value) %>%
+      group_by(Location, Var, RCP, Model, Month)
+    x
+  })
+
+  Data_sub <- reactive({
+    p <- input$loc_toy
+    monthly <- p %in% month.abb
+    mos <- if(monthly) p else month.abb[sea.idx[[input$loc_toy]]]
+    x <- Data() %>% filter(Month %in% mos)
+    if(monthly){
+      x <- group_by(x)
+    } else {
+      f_sea <- if(Loc_Var()=="pr") sum else mean
+      rnd <- ifelse(Loc_Var()=="pr", 0, 1)
+      if(p=="Winter"){
+        x <- mutate(x, PrevYear=c(NA, value[1:(length(value)-1)])) %>%
+          mutate(value=ifelse(Month=="Dec", PrevYear, value))
+      }
+      x <- mutate(x, Season=factor(season.labels.long[match(Month, month.abb)], levels=season.labels)) %>%
+        group_by(Location, Var, RCP, Model, Year, Season) %>% summarise(value=f_sea(value)) %>% group_by %>%
+        mutate(value=round(value, rnd))
+    }
+    x
+  })
 
   # Outputs for location modal
-  output$TestPlot <- renderPlot({ ggplot(Data(), aes(value, Year)) + geom_line() + geom_smooth() })
+  output$TestPlot <- renderPlot({
+    ggplot(Data_sub(), aes_string("Year", "value", colour="Model")) + geom_line() + geom_smooth() +
+      labs(y=input$loc_variable) + theme(legend.position="bottom")
+  })
 
   output$TestTable <- renderDataTable({
-    Data()
+    Data_sub()
   }, options = list(pageLength=5))
 
   # Spatial distribution density plot
