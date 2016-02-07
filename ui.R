@@ -10,14 +10,18 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
   leafletOutput("Map", width="100%", height="100%"),
   absolutePanel(id="controls", top=360, left=0, height=300, width=300,
     conditionalPanel("input.show_communities == true",
-      selectInput("location", "Community", c("", locs$loc), selected="", multiple=F),
+      selectInput("location", "Community", c("", locs$loc), selected=""),
       conditionalPanel("input.location !== null && input.location !== ''",
         actionButton("btn_modal_loc", "View Summary", class="btn-block"))
     )
   ),
   bsModal("Modal_Loc", "Community Insights", "btn_modal_loc", size = "large",
-          plotOutput("TestPlot"),
-          dataTableOutput("TestTable")
+          fluidRow(
+            column(3, selectInput("loc_variable", "", var.labels, var.labels[1])),
+            column(3, selectInput("loc_rcp", "", rcps, rcps[1])),
+            column(3, selectInput("loc_toy", "", toy_list, toy_list[[1]][1]))
+          ),
+          plotOutput("TestPlot")#, dataTableOutput("TestTable")
   ),
   absolutePanel(id="controls", top=360, right=0, height=300, width=300,
     conditionalPanel("input.show_colpal == true",
