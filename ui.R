@@ -20,7 +20,8 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
             column(3, selectInput("loc_variable", "", var.labels, var.labels[1])),
             column(3, selectInput("loc_rcp", "", rcps, rcps[1])),
             column(3, selectInput("loc_toy", "", toy_list, toy_list[[1]][1])),
-            checkboxInput("loc_deltas", "Display deltas", FALSE)
+            checkboxInput("loc_deltas", "Display deltas", FALSE),
+            checkboxInput("loc_cru", "Show historical", FALSE)
           ),
           plotOutput("TestPlot")#, dataTableOutput("TestTable")
   ),

@@ -192,7 +192,7 @@ shinyServer(function(input, output, session) {
     x
   })
 
-  Data_sub2 <- reactive({ # transform to deltas if required
+  Data_sub2 <- reactive({ # transform to deltas and/or remove CRU 3.2 if required
     x <- Data_sub()
     cru.mean <- (filter(x, Model=="CRU 3.2" & Year %in% 1961:1990) %>% summarise(Mean=mean(value)))$Mean
     if(input$loc_deltas){
@@ -204,16 +204,18 @@ shinyServer(function(input, output, session) {
         x <- mutate(x, value=round(value - cru.mean, 2))
       }
     }
+    if(!input$loc_cru) x <- filter(x, Model!="CRU 3.2")
     x
   })
 
   # Outputs for location modal
   output$TestPlot <- renderPlot({
-    p <- Loc_Var()=="Precipitation"
+    p <- Loc_Var()=="pr"
     d <- input$loc_deltas
     ylb <- if(p & d) "Precipitation deltas" else if(p) "Precipitation (mm)" else if(!p & d) "Temperature deltas (C)" else "Temperature (C)"
-    g <- ggplot(Data_sub2(), aes_string("Year", "value", colour="Model")) + geom_line() +
-      labs(y=ylb) + theme(legend.position="bottom")
+    g <- ggplot(Data_sub2(), aes(Year, value, colour=Model)) + geom_line() +
+      labs(y=ylb) + theme(legend.position="bottom") +
+      stat_summary(data=filter(Data_sub2(), Model!="CRU 3.2"), aes(colour=NULL), geom="smooth", colour="black")
     g
   })
 
