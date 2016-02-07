@@ -16,14 +16,24 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     )
   ),
   bsModal("Modal_Loc", "Community Insights", "btn_modal_loc", size = "large",
-          fluidRow(
-            column(3, selectInput("loc_variable", "", var.labels, var.labels[1])),
-            column(3, selectInput("loc_rcp", "", rcps, rcps[1])),
-            column(3, selectInput("loc_toy", "", toy_list, toy_list[[1]][1])),
-            checkboxInput("loc_deltas", "Display deltas", FALSE),
-            checkboxInput("loc_cru", "Show historical", FALSE)
-          ),
-          plotOutput("TestPlot")#, dataTableOutput("TestTable")
+    fluidRow(
+      column(3,
+        selectInput("loc_variable", "", var.labels, var.labels[1]),
+        checkboxInput("loc_deltas", "Display deltas", FALSE)
+      ),
+      column(3,
+        selectInput("loc_rcp", "", rcps, rcps[1]),
+        checkboxInput("loc_cru", "Show historical", FALSE)
+      ),
+      column(3,
+        selectInput("loc_stat", "", c("All GCMs", "Mean GCM", "Both"), "All GCMs"),
+        checkboxInput("loc_trend", "Smooth trend", FALSE)
+      ),
+      column(3,
+        selectInput("loc_toy", "", toy_list, toy_list[[1]][1])
+      )
+    ),
+    plotOutput("TestPlot")#, dataTableOutput("TestTable")
   ),
   absolutePanel(id="controls", top=360, right=0, height=300, width=300,
     conditionalPanel("input.show_colpal == true",
