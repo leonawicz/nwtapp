@@ -25,7 +25,8 @@ season.labels <- names(cru6190[[1]])[13:16]
 season.labels.long <- season.labels[c(1,1,2,2,2,3,3,3,4,4,4,1)]
 sea.idx <- list(Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
 toy_list <- list(Season=season.labels, Month=month.abb)
-rcps <- unique(d$RCP)
+rcps <- sort(unique(d$RCP))
+rcp.labels <- c("RCP 4.5", "RCP 6.0", "RCP 8.5")
 models <- unique(d$Model)
 vars <- sort(unique(d$Var))
 var.labels <- c("Precipitation", "Temperature")

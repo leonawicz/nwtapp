@@ -22,7 +22,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
         checkboxInput("loc_deltas", "Display deltas", FALSE)
       ),
       column(3,
-        selectInput("loc_rcp", "", rcps, rcps[1]),
+        selectInput("loc_rcp", "", rcp.labels, rcp.labels[1]),
         checkboxInput("loc_cru", "Show historical", FALSE)
       ),
       column(3,
@@ -66,7 +66,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       column(6,
         conditionalPanel("input.mon_or_sea == 'Monthly'", selectInput("mon", "Month", month.abb, month.abb[1])),
         conditionalPanel("input.mon_or_sea == 'Seasonal'", selectInput("sea", "Season", season.labels, season.labels[1])),
-        selectInput("rcp", "RCP", rcps, rcps[1]),
+        selectInput("rcp", "RCP", rcp.labels, rcp.labels[1]),
         conditionalPanel("input.mod_or_stat == 'Single GCM'", selectInput("model", "Model", models, models[1])),
         conditionalPanel("input.mod_or_stat == 'Statistic'", selectInput("model_stats", "Stat", c("Mean", "Min", "Max", "Spread"), "Mean"))
       )

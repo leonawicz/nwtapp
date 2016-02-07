@@ -9,6 +9,8 @@ shinyServer(function(input, output, session) {
 
   Variable <- reactive({ vars[var.labels==input$variable] })
 
+  RCPs <- reactive({ rcps[rcp.labels==input$rcp] })
+
   sea_func <- reactive({ if(Variable()=="pr") sum else mean })
 
   stat_func <- reactive({
@@ -43,13 +45,13 @@ shinyServer(function(input, output, session) {
     }
 
     if(input$mod_or_stat=="Statistic"){
-      x <- filter(d, Var==Variable() & RCP==input$rcp) %>% group_by(Model, add=T) %>%
+      x <- filter(d, Var==Variable() & RCP==RCPs()) %>% group_by(Model, add=T) %>%
         mung_stats(input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), input$model_stats)
       return(x)
     }
 
     if(input$mod_or_stat=="Single GCM"){
-      x <- filter(d, Var==Variable() & RCP==input$rcp & Model==input$model)$Maps[[1]]
+      x <- filter(d, Var==Variable() & RCP==RCPs() & Model==input$model)$Maps[[1]]
       x <- mung_models(x, input$mon_or_sea, mon_index(), dec.idx, mon.idx, sea_func())
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
@@ -159,9 +161,11 @@ shinyServer(function(input, output, session) {
   # Location data
   Loc_Var <- reactive({ vars[var.labels==input$loc_variable] })
 
+  Loc_RCPs <- reactive({ rcps[rcp.labels==input$loc_rcp] })
+
   Data <- reactive({
     x <- select(d, Var, RCP, Model, Locs) %>% group_by(RCP, Model, Var) %>%
-      filter(Var==Loc_Var() & RCP==input$loc_rcp) %>%
+      filter(Var==Loc_Var() & RCP==Loc_RCPs()) %>%
       arrange(Var, RCP, Model) %>%
       do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest
 
