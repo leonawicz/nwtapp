@@ -171,7 +171,7 @@ shinyServer(function(input, output, session) {
     x
   })
 
-  Data_sub <- reactive({
+  Data_sub <- reactive({ # subset data
     p <- input$loc_toy
     monthly <- p %in% month.abb
     mos <- if(monthly) p else month.abb[sea.idx[[input$loc_toy]]]
@@ -192,14 +192,33 @@ shinyServer(function(input, output, session) {
     x
   })
 
+  Data_sub2 <- reactive({ # transform to deltas if required
+    x <- Data_sub()
+    cru.mean <- (filter(x, Model=="CRU 3.2" & Year %in% 1961:1990) %>% summarise(Mean=mean(value)))$Mean
+    if(input$loc_deltas){
+      x <- group_by(x, Model)
+      if(Loc_Var()=="pr"){
+         x <- mutate(x, value=round(value / cru.mean, 2))
+        #x[is.infinite(x)] <- NA
+      } else {
+        x <- mutate(x, value=round(value - cru.mean, 2))
+      }
+    }
+    x
+  })
+
   # Outputs for location modal
   output$TestPlot <- renderPlot({
-    ggplot(Data_sub(), aes_string("Year", "value", colour="Model")) + geom_line() + geom_smooth() +
-      labs(y=input$loc_variable) + theme(legend.position="bottom")
+    p <- Loc_Var()=="Precipitation"
+    d <- input$loc_deltas
+    ylb <- if(p & d) "Precipitation deltas" else if(p) "Precipitation (mm)" else if(!p & d) "Temperature deltas (C)" else "Temperature (C)"
+    g <- ggplot(Data_sub2(), aes_string("Year", "value", colour="Model")) + geom_line() +
+      labs(y=ylb) + theme(legend.position="bottom")
+    g
   })
 
   output$TestTable <- renderDataTable({
-    Data_sub()
+    Data_sub2()
   }, options = list(pageLength=5))
 
   # Spatial distribution density plot
