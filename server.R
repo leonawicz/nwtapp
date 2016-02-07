@@ -1,5 +1,6 @@
 library(ggplot2)
 colpals <- RColorBrewer::brewer.pal.info
+theme1 <- theme(plot.background=element_blank(), legend.position="bottom")
 
 shinyServer(function(input, output, session) {
 
@@ -15,8 +16,10 @@ shinyServer(function(input, output, session) {
   sea_func <- reactive({ if(Variable()=="pr") sum else mean })
 
   stat_func <- reactive({
-      switch(input$model_stats,
-    Mean=mean,  Min=function(x,...) min(x,...), Max=function(x,...) max(x,...), Spread=function(x,...) range(x,...))
+    p <- input$mod_or_stat
+    if(p %in% models) return()
+    switch(p, Mean=mean,  Min=function(x,...) min(x,...), Max=function(x,...) max(x,...),
+      Spread=function(x,...) range(x,...))
   })
 
   CRU_ras <- reactive({
@@ -28,6 +31,7 @@ shinyServer(function(input, output, session) {
   ras <- reactive({
     dec.idx <- which(decades==input$dec)
     mon.idx <- switch(input$toy, Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
+    p <- input$mod_or_stat
 
     mung_models <- function(x, monthly, mo, dec, mo2, f_sea){
       if(monthly){
@@ -45,14 +49,14 @@ shinyServer(function(input, output, session) {
       round(x, 1)
     }
 
-    if(input$mod_or_stat=="Statistic"){
+    if(!(p %in% models)){
       x <- filter(d, Var==Variable() & RCP==RCPs()) %>% group_by(Model, add=T) %>%
-        mung_stats(Monthly(), mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), input$model_stats)
+        mung_stats(Monthly(), mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), p)
       return(x)
     }
 
-    if(input$mod_or_stat=="Single GCM"){
-      x <- filter(d, Var==Variable() & RCP==RCPs() & Model==input$model)$Maps[[1]]
+    if(p %in% models){
+      x <- filter(d, Var==Variable() & RCP==RCPs() & Model==p)$Maps[[1]]
       x <- mung_models(x, Monthly(), mon_index(), dec.idx, mon.idx, sea_func())
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
@@ -228,7 +232,7 @@ shinyServer(function(input, output, session) {
     }
     ylb <- if(p & del) "Precipitation deltas" else if(p) "Precipitation (mm)" else if(!p & del) "Temperature deltas (C)" else "Temperature (C)"
     g <- ggplot(d, aes(Year, value, colour=Model)) + scale_color_manual("", values=clrs) + labs(y=ylb) +
-      theme_gray(base_size=16) + theme(legend.position="bottom")
+      theme_gray(base_size=16) + theme1
     if(input$loc_stat=="All GCMs") g <- g + geom_line()
     if(input$loc_stat=="Both"){
       g <- g + geom_line() + stat_summary(data=d2, aes(colour=NULL), fun.y=mean, geom="line", colour="black", size=1)
@@ -240,20 +244,15 @@ shinyServer(function(input, output, session) {
     g
   })
 
-  output$TestTable <- renderDataTable({
-    Data_sub2()
-  }, options = list(pageLength=5))
-
   # Spatial distribution density plot
   output$sp_density_plot <- renderPlot({
     x <- ras_vals()
     x <- data.table(`Spatial Distribution`=x[!is.na(x)])
-    tp_theme <- theme(plot.background=element_blank())
-    ggplot(x, aes(`Spatial Distribution`)) + geom_density(fill="#33333350") + tp_theme + labs(x=Legend_Title())
+    ggplot(x, aes(`Spatial Distribution`)) + geom_density(fill="#33333350") + theme1 + labs(x=Legend_Title())
   }, width=300, height=300, bg="transparent")
 
   observe({ # no deltas allowed when comparing across models
-    if(input$mod_or_stat=="Statistic"){
+    if(!(input$mod_or_stat %in% models)){
       updateCheckboxInput(session, "deltas", value=FALSE)
     }
   })

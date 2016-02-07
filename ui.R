@@ -33,7 +33,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
         selectInput("loc_toy", "", toy_list, toy_list[[1]][1])
       )
     ),
-    plotOutput("TestPlot")#, dataTableOutput("TestTable")
+    plotOutput("TestPlot")
   ),
   absolutePanel(id="controls", top=360, right=0, height=300, width=300,
     conditionalPanel("input.show_colpal == true",
@@ -60,13 +60,11 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     fluidRow(
       column(6,
         selectInput("toy", "", toy_list, toy_list[[1]][1]),
-        selectInput("variable", "Variable", var.labels, var.labels[1]),
-        selectInput("mod_or_stat", "GCM data", c("Single GCM", "Statistic"), "Single GCM")
+        selectInput("rcp", "RCP", rcp.labels, rcp.labels[1])
       ),
       column(6,
-        selectInput("rcp", "RCP", rcp.labels, rcp.labels[1]),
-        conditionalPanel("input.mod_or_stat == 'Single GCM'", selectInput("model", "Model", models, models[1])),
-        conditionalPanel("input.mod_or_stat == 'Statistic'", selectInput("model_stats", "Stat", c("Mean", "Min", "Max", "Spread"), "Mean"))
+        selectInput("variable", "Variable", var.labels, var.labels[1]),
+        selectInput("mod_or_stat", "GCM data", maptype_list, maptype_list[[1]][1])
       )
     )
   ),
@@ -74,7 +72,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
-    conditionalPanel("input.mod_or_stat == 'Single GCM'", checkboxInput("deltas", "Display deltas", FALSE)),
+    conditionalPanel(is_gcm_string, checkboxInput("deltas", "Display deltas", FALSE)),
     checkboxInput("show_communities", "Show communities", TRUE),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
