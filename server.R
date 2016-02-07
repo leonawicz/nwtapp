@@ -162,11 +162,13 @@ shinyServer(function(input, output, session) {
   Data <- reactive({
     x <- select(d, Var, RCP, Model, Locs) %>% group_by(RCP, Model, Var) %>%
       filter(Var==Loc_Var() & RCP==input$loc_rcp) %>%
+      arrange(Var, RCP, Model) %>%
       do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest
 
     x <- group_by(d.cru, Var) %>% do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest %>%
       filter(Var==Loc_Var()) %>% mutate(RCP="historical", Model="CRU 3.2") %>% bind_rows(x) %>%
       select(Location, Var, RCP, Model, Year, Month, value) %>%
+      mutate(Model=factor(Model, levels=unique(Model))) %>%
       group_by(Location, Var, RCP, Model, Month)
     x
   })
@@ -210,12 +212,26 @@ shinyServer(function(input, output, session) {
 
   # Outputs for location modal
   output$TestPlot <- renderPlot({
+    d <- Data_sub2()
+    d2 <- filter(d, Model!="CRU 3.2")
     p <- Loc_Var()=="pr"
-    d <- input$loc_deltas
-    ylb <- if(p & d) "Precipitation deltas" else if(p) "Precipitation (mm)" else if(!p & d) "Temperature deltas (C)" else "Temperature (C)"
-    g <- ggplot(Data_sub2(), aes(Year, value, colour=Model)) + geom_line() +
-      labs(y=ylb) + theme(legend.position="bottom") +
-      stat_summary(data=filter(Data_sub2(), Model!="CRU 3.2"), aes(colour=NULL), geom="smooth", colour="black")
+    del <- input$loc_deltas
+    clrs <- c("darkgray", "cornflowerblue", "orange", "purple", "dodgerblue4", "firebrick")
+    if(!input$loc_cru){
+      clrs <- clrs[-1]
+      d <- d2
+    }
+    ylb <- if(p & del) "Precipitation deltas" else if(p) "Precipitation (mm)" else if(!p & del) "Temperature deltas (C)" else "Temperature (C)"
+    g <- ggplot(d, aes(Year, value, colour=Model)) + scale_color_manual("", values=clrs) + labs(y=ylb) +
+      theme_gray(base_size=16) + theme(legend.position="bottom")
+    if(input$loc_stat=="All GCMs") g <- g + geom_line()
+    if(input$loc_stat=="Both"){
+      g <- g + geom_line() + stat_summary(data=d2, aes(colour=NULL), fun.y=mean, geom="line", colour="black", size=1)
+    } else if(input$loc_stat=="Mean GCM"){
+      if(input$loc_cru) g <- g + geom_line(data=filter(d, Model=="CRU 3.2"))
+      g <- g + stat_summary(data=d2, aes(colour=NULL), fun.y=mean, geom="line", colour="black", size=1)
+    }
+    if(input$loc_trend) g <- g + geom_smooth(aes(colour=NULL), colour="black", size=1)
     g
   })
 
