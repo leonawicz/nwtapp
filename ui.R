@@ -29,7 +29,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       conditionalPanel("input.show_communities == true",
         selectInput("location", "Community", c("", locs$loc), selected="", width="100%"),
           conditionalPanel("input.location !== null && input.location !== ''",
-            actionButton("btn_modal_loc", "View Summary", class="btn-block"))
+            actionButton("btn_modal_loc", "Community Insights", class="btn-block"))
       )
     )
   ),
