@@ -66,9 +66,9 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
       ),
       fluidRow(
         column(6, conditionalPanel("input.colpal == 'Custom div' || input.colpal == 'Custom seq'",
-          colourInput("col_low", "Low", value = "#8C0050"))),
+          colourInput("col_low", "Low", value = "#000470"))),
         column(6, conditionalPanel("input.colpal == 'Custom div' || input.colpal == 'Custom seq'",
-          colourInput("col_high", "High", value = "#000470")))
+          colourInput("col_high", "High", value = "#8C0050")))
       )
     )
     )
