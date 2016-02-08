@@ -57,24 +57,20 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("show_colpal", "Show color options", FALSE)
   ),
-  absolutePanel(id="controls", bottom=140, left=-10, height=300, width=300,
+  absolutePanel(id="controls", bottom=160, left=-10, height=200, width=320,
     conditionalPanel("input.show_colpal == true",
-      wellPanel(
-        fluidRow(
-          column(6,
-            conditionalPanel("(input.colpal_type == 'Divergent' && input.colpal_div == 'Custom') ||
-              (input.colpal_type == 'Sequential' && input.colpal_seq == 'Custom')",
-              colourInput("col_low", "Low", value = "#8C0050"),
-                conditionalPanel("input.colpal_type == 'Divergent'", colourInput("col_med", "Med", value = "#CEEBF0")),
-                  colourInput("col_high", "High", value = "#000470"))
-         ),
-         column(6,
-           selectInput("colpal_type", "Style", c("Divergent", "Sequential"), "Divergent"),
-           conditionalPanel("input.colpal_type == 'Divergent'", uiOutput("Colpal_div_options")),
-           conditionalPanel("input.colpal_type == 'Sequential'", uiOutput("Colpal_seq_options"))
-         )
-       )
-     )
+    wellPanel(
+      fluidRow(
+        column(6, selectInput("colpal", "Palette", colpals_list, colpals_list[[1]][1])),
+        column(6, conditionalPanel("input.colpal == 'Custom div'", colourInput("col_med", "Med", value = "#CEEBF0")))
+      ),
+      fluidRow(
+        column(6, conditionalPanel("input.colpal == 'Custom div' || input.colpal == 'Custom seq'",
+          colourInput("col_low", "Low", value = "#8C0050"))),
+        column(6, conditionalPanel("input.colpal == 'Custom div' || input.colpal == 'Custom seq'",
+          colourInput("col_high", "High", value = "#000470")))
+      )
+    )
     )
   )
   )

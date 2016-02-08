@@ -1,5 +1,4 @@
 library(ggplot2)
-colpals <- RColorBrewer::brewer.pal.info
 theme1 <- theme(plot.background=element_blank(), legend.position="bottom")
 
 shinyServer(function(input, output, session) {
@@ -73,23 +72,12 @@ shinyServer(function(input, output, session) {
   ras_vals <- reactive({ values(ras()) })
 
   # Colors and color palettes
-  output$Colpal_div_options <- renderUI({
-    pals <- c("Custom", rownames(colpals)[colpals["category"]=="div"])
-    selectInput("colpal_div", "Palette", pals, pals[1])
-  })
-
-  output$Colpal_seq_options <- renderUI({
-    pals <- c("Custom", rownames(colpals)[colpals["category"]=="seq"])
-    selectInput("colpal_seq", "Palette", pals, pals[1])
-  })
-
   Colors <- reactive({
-    req(input$colpal_div)
-    type <- input$colpal_type
+    req(input$colpal)
+    pal <- input$colpal
     custom.colors <- c(input$col_low, input$col_med, input$col_high)
-    if(type=="Sequential") custom.colors <- custom.colors[c(1,3)]
-    pal <- if(type=="Divergent") input$colpal_div else if(type=="Sequential") input$colpal_seq
-    if(pal=="Custom") custom.colors else pal
+    if(pal %in% sq) custom.colors <- custom.colors[c(1,3)]
+    if(pal %in% c("Custom div", "Custom seq")) custom.colors else pal
   })
 
   pal <- reactive({
