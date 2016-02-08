@@ -116,6 +116,7 @@ shinyServer(function(input, output, session) {
     if (input$show_communities) {
       proxy %>% showGroup("locations")
     } else {
+      updateSelectInput(session, "location", selected="")
       proxy %>% hideGroup("locations") %>% removeMarker(layerId="Selected")
     }
   })
@@ -149,6 +150,7 @@ shinyServer(function(input, output, session) {
       proxy %>% setView(lng=p2$lon, lat=p2$lat, input$Map_zoom) %>% addCircleMarkers(p2$lon, p2$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p2)
     }
   })
+
   #### END Map-related observers ####
 
   # Location data
