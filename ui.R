@@ -1,15 +1,18 @@
 shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
   #tags$style(type="text/css", "html, body {width:100%;height:100%}"),
   title=HTML('<div><a href="http://snap.uaf.edu" target="_blank"><img src="./img/SNAP_acronym_100px.png" width="100%"></a></div>'),
-  windowTitle="NWT",
+  windowTitle="NT",
   collapsible=TRUE,
   id="nb",
-  tabPanel("NWT Projections", value="vis",
+  tabPanel("Climate", value="vis",
   div(class="outer",
   tags$head(includeCSS("www/styles.css")),
   leafletOutput("Map", width="100%", height="100%"),
+  absolutePanel(top=20, left=60, height=20, width=600,
+    h4("Northwest Territories Future Climate Outlook")
+  ),
   absolutePanel(id="controls", top=20, right=-10, height=200, width=400,
-    sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=decades[1], step=10, sep="", post="s"),
+    sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=max(decades), step=10, sep="", post="s", width="100%"),
     wellPanel(
       fluidRow(
         column(6,
@@ -48,7 +51,7 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"), inverse=TRUE,
     ),
     plotOutput("TestPlot")
   ),
-  absolutePanel(id="controls", top=20, left=-20, height=300, width=300, draggable=TRUE,
+  absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=TRUE,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
