@@ -3,6 +3,8 @@ theme1 <- theme(plot.background=element_blank(), legend.position="bottom")
 
 shinyServer(function(input, output, session) {
 
+  #observe({ if(input$nb=="") updateNavbarPage(session, "nb", selected="vis") })
+
   # setup
   Monthly <- reactive({ input$toy %in% month.abb })
   Mos <- reactive({ if(Monthly()) input$toy else month.abb[sea.idx[[input$toy]]] })
@@ -150,7 +152,6 @@ shinyServer(function(input, output, session) {
       proxy %>% setView(lng=p2$lon, lat=p2$lat, input$Map_zoom) %>% addCircleMarkers(p2$lon, p2$lat, radius=10, color="black", fillColor="orange", fillOpacity=1, opacity=1, stroke=TRUE, layerId="Selected") #add_CM(p2)
     }
   })
-
   #### END Map-related observers ####
 
   # Location data

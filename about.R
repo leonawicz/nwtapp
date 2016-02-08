@@ -1,12 +1,12 @@
-tabPanel("About",
+about <- tabPanel("About",
   HTML(
     '<p style="text-align:justify">This R Shiny web application presents future climate outlooks for Northwest Territories (NT), Canada.
-    Maps show spatially explicit projections of temperature and precipitation based on SNAP\'s downscaled CMIP5 global climate models (GCMs) for three emissions scenarios.
-    Climate trends are available as raw values or as changes from 1961-1990 baseline averages. Maps are based on decadal averages.</p>
-    <p style="text-align:justify">When viewing raw values, avalable maps consist of any of the five individual GCMs or maps which aggregate or compare those models.</p>
+    Decadal maps show spatially explicit projections of temperature and precipitation based on SNAP\'s downscaled CMIP5 global climate models (GCMs) for three emissions scenarios.
+    Climate trends are available as raw values or as changes from 1961-1990 baseline averages.
+    When viewing raw values, available maps consist of individual GCMs or maps which aggregate or compare those models.</p>
     <p style="text-align:justify">NT communities are also available. When viewing a community summary, a time series plot will appear highlighting trends for the community.
-    Even though the maps are at a decadal resolution, community data is annual.</p>
-    <p style="text-align:justify">NT communities in the app are a small subset of the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts R app</a>.</p>'),
+    Even though the maps are at a decadal resolution, community data is annual.
+    NT communities in the app are a small subset of those found in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts R app</a>.</p>'),
 
   HTML('
     <div style="clear: left;"><img src="http://www.gravatar.com/avatar/52c27b8719a7543b4b343775183122ea.png" alt="" style="float: left; margin-right:5px" /></div>
