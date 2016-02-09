@@ -1,6 +1,3 @@
-library(ggplot2)
-theme1 <- theme(plot.background=element_blank(), legend.position="bottom")
-
 shinyServer(function(input, output, session) {
 
   # setup
