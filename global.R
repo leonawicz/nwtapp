@@ -1,5 +1,18 @@
-pkgs <- list("shiny", "shinyBS", "shinyjs", "leaflet", "rgdal", "raster", "data.table", "dplyr", "tidyr", "ggplot2")
-suppressMessages(lapply(pkgs, function(x) library(x, character.only=T)))
+#pkgs <- list("shiny", "shinyBS", "shinyjs", "leaflet", "rgdal", "raster", "data.table", "dplyr", "tidyr", "ggplot2")
+#suppressMessages(lapply(pkgs, function(x) library(x, character.only=T)))
+
+suppressMessages({
+library(shiny)
+library(shinyBS)
+library(shinyjs)
+library(leaflet)
+library(rgdal)
+library(raster)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+})
 
 options(warn = -1) # # haven't figured out how to suppress warning from colors(.)
 
