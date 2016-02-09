@@ -17,10 +17,10 @@ about <- tabPanel("About",
     Changes in temperature are differences whereas changes in precipitation are proportional.</p>'
   ),
   fluidRow(
-    column(3, actionButton("help_rcp_btn", "More About RCPs", class="btn-block"), br()),
-    column(3, actionButton("help_loc_btn", "About communities", class="btn-block"), br())
+    column(3, actionButton("btn_help_rcps", "More About RCPs", class="btn-block"), br()),
+    column(3, actionButton("btn_help_locs", "About communities", class="btn-block"), br())
   ),
-  bsModal("modal_rcp", "Representative Concentration Pathways", "help_rcp_btn", size="large",
+  bsModal("modal_help_rcps", "Representative Concentration Pathways", "btn_help_rcps", size="large",
     HTML('
       <p style="text-align:justify">Together the RCPs show a range of possible future atmospheric greenhouse gas concentrations driven by human activity.
       The RCP values represent radiative forcing (W/m^2) in 2100 relative to pre-industrial levels.
@@ -35,7 +35,7 @@ about <- tabPanel("About",
       More information on these RCPs can be found in the 2014 IPCC fifth Assessment Report.'
     )
   ),
-  bsModal("modal_loc", "Northwest Territories communities", "help_loc_btn", size="large",
+  bsModal("modal_help_locs", "Northwest Territories communities", "btn_help_locs", size="large",
     HTML('
       <p style="text-align:justify">The Northwest Territories communities in this app are a small subset of about 4,000 communities
       in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts app</a>.
