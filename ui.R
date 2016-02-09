@@ -52,16 +52,17 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
       )
     )
   ),
-  absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=TRUE,
+  absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=FALSE,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
     conditionalPanel(is_gcm_string, checkboxInput("deltas", "Display deltas", FALSE)),
     checkboxInput("show_communities", "Show communities", TRUE),
+    checkboxInput("show_colpal", "Show color options", FALSE),
     checkboxInput("legend", "Show legend", TRUE),
-    checkboxInput("show_colpal", "Show color options", FALSE)
+    checkboxInput("ttips", "Show popup details", TRUE)
   ),
-  absolutePanel(id="controls", bottom=160, left=-10, height=200, width=320,
+  absolutePanel(id="controls", bottom=200, left=-10, height=190, width=320,
     conditionalPanel("input.show_colpal == true",
     wellPanel(
       fluidRow(

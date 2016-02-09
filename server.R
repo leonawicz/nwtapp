@@ -248,4 +248,23 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # tooltips
+  observe({
+    if(length(input$ttips) && input$ttips){
+      addTooltip(session, "dec", "Maps show decadal averages of projected climate.", "left", options=list(container="body"))
+      addTooltip(session, "toy", "3-month seasons or specific months. Winter is Dec-Feb and so on.", "left", options=list(container="body"))
+      addTooltip(session, "rcp", "Representative Concentration Pathways, covering a range of possible future climates based on atmospheric greenhouse gas concentrations.", "left", options=list(container="body"))
+      addTooltip(session, "mod_or_stat", "Individual climate models or a statistic combining all five.", "left", options=list(container="body"))
+      addTooltip(session, "location", "Enter a community. Menu filters as you type. Or select a community on map.", "left", options=list(container="body"))
+      addTooltip(session, "deltas", "Display projected change from 1961-1990 baseline average instead of raw climate values.", "right", options=list(container="body"))
+    } else {
+      removeTooltip(session, "dec")
+      removeTooltip(session, "toy")
+      removeTooltip(session, "rcp")
+      removeTooltip(session, "mod_or_stat")
+      removeTooltip(session, "location")
+      removeTooltip(session, "deltas")
+    }
+  })
+
 })
