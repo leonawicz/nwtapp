@@ -1,5 +1,9 @@
 source("about.R", local=T)
 
+# for shinyapps.io, use theme="spacelab.css" with file in www folder.
+# for local/RStudio and shiny-server, use theme="http://bootswatch.com/spacelab/bootstrap.css" (this is ignored on shinyapps.io)
+# shinytheme() from shinythemes package must be avoided because it conflicts with bsModal in shinyBS.
+
 shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse=TRUE,
   title=HTML('<div><a href="http://snap.uaf.edu" target="_blank"><img src="./img/SNAP_acronym_100px.png" width="100%"></a></div>'),
   windowTitle="NT Climate",
