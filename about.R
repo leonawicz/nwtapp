@@ -3,6 +3,8 @@ about <- tabPanel("About",
     '<p style="text-align:justify">This R Shiny web application presents future climate outlooks for Northwest Territories (NT), Canada.
     Decadal maps show spatially explicit projections of temperature and precipitation based on SNAP\'s downscaled CMIP5 global climate models (GCMs) for three emissions scenarios.
     Climate trends are available as raw values or as changes from 1961-1990 baseline averages.
+    Historical baselines are based on SNAP\'s downscaled historical data from the Climatological Research Unit (CRU) version 3.2 time series
+    and the CRU 10-minute resolution climatology 2.0, to which the GCMs are also downscaled.
     When viewing raw values, available maps consist of individual GCMs or maps which aggregate or compare those models.</p>
     <p style="text-align:justify">NT communities are also available. When viewing a community summary, a time series plot will appear highlighting trends for the community.
     Even though the maps are at a decadal resolution, community data is annual.
