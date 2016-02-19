@@ -27,8 +27,12 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
       column(3,
         selectInput("loc_toy", "", toy_list, toy_list[[1]][1])
       )
-   ),
-   plotOutput("TS_Plot")
+    ),
+    plotOutput("TS_Plot"),
+    fluidRow(
+      column(3, downloadButton("dl_tsplot", "Get Plot", class="btn-block")),
+      column(3, downloadButton("dl_loc_data", "Get Data", class="btn-block"))
+    )
   ),
   div(class="outer",
   tags$head(includeCSS("www/styles.css")),
