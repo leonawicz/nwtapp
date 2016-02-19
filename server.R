@@ -205,8 +205,18 @@ shinyServer(function(input, output, session) {
     x
   })
 
+  loc_data_filename <- reactive({ # input$gbm_plottype and GBM_Region2() don't update from with server-side UI selectInput
+    #paste0("gbmResults_", gsub(" ", "", input$gbm_plottype), "_", gsub(" ", "", GBM_Region()), gsub(" ", "", GBM_Region2()), ".pdf")
+    "current_plot_data.csv"
+  })
+
   # Outputs for location modal
-  output$TS_Plot <- renderPlot({
+  output$dl_loc_data <- downloadHandler(
+    filename=loc_data_filename(),
+    content=function(file){	write.csv(Data_sub2(), file, quote=FALSE, row.names=FALSE) }
+  )
+
+  do_tsplot <- reactive({
     req(input$modal_loc)
     if(!input$modal_loc) return()
     d <- Data_sub2()
@@ -231,6 +241,21 @@ shinyServer(function(input, output, session) {
     if(input$loc_trend) g <- g + geom_smooth(aes(colour=NULL), colour="black", size=1)
     g
   })
+
+  output$TS_Plot <- renderPlot({ do_tsplot() })
+
+  tsplot_filename <- reactive({ # input$gbm_plottype and GBM_Region2() don't update from with server-side UI selectInput
+    #paste0("gbmResults_", gsub(" ", "", input$gbm_plottype), "_", gsub(" ", "", GBM_Region()), gsub(" ", "", GBM_Region2()), ".pdf")
+    "current_plot.pdf"
+  })
+
+  tsplot_h <- reactive({ session$clientData$output_TS_Plot_height })
+  tsplot_w <- reactive({ session$clientData$output_TS_Plot_width })
+
+  output$dl_tsplot <- downloadHandler(
+    filename=tsplot_filename(),
+    content=function(file){	pdf(file=file, width=15, height=15*tsplot_h()/tsplot_w(), pointsize=6); print(do_tsplot()); dev.off() }
+  )
 
   # Spatial distribution density plot
   output$sp_density_plot <- renderPlot({
