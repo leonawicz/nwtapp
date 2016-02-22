@@ -57,8 +57,9 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
             actionButton("btn_modal_loc", "Community Insights", class="btn-block"))
       )
     ),
-    sliderInput("lon_range", "Longitude", min=ext[1], max=ext[2], value=ext[1:2], step=1, sep="", post="°", width="100%"),
-    sliderInput("lat_range", "Latitude", min=ext[3], max=ext[4], value=ext[3:4], step=1, sep="", post="°", width="100%")
+    conditionalPanel("input.show_extent == true",
+      sliderInput("lon_range", "Longitude", min=ext[1], max=ext[2], value=ext[1:2], step=1, sep="", post="°", width="100%"),
+      sliderInput("lat_range", "Latitude", min=ext[3], max=ext[4], value=ext[3:4], step=1, sep="", post="°", width="100%"))
   ),
   absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=FALSE,
     plotOutput("sp_density_plot", width="100%", height="auto")
@@ -66,11 +67,12 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
   absolutePanel(bottom=10, left=10,
     conditionalPanel(is_gcm_string, checkboxInput("deltas", "Display deltas", FALSE)),
     checkboxInput("show_communities", "Show communities", TRUE),
+    checkboxInput("show_extent", "Show/crop extent", FALSE),
     checkboxInput("show_colpal", "Show color options", FALSE),
     checkboxInput("legend", "Show legend", TRUE),
     checkboxInput("ttips", "Show popup details", TRUE)
   ),
-  absolutePanel(id="controls", bottom=200, left=-10, height=190, width=320,
+  absolutePanel(id="controls", bottom=240, left=-10, height=190, width=320,
     conditionalPanel("input.show_colpal == true",
     wellPanel(
       fluidRow(
