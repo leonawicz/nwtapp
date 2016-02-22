@@ -37,9 +37,7 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
   div(class="outer",
   tags$head(includeCSS("www/styles.css")),
   leafletOutput("Map", width="100%", height="100%"),
-  absolutePanel(top=20, left=60, height=20, width=600,
-    h4("Northwest Territories Future Climate Outlook")
-  ),
+  absolutePanel(top=20, left=60, height=20, width=600, h4("Northwest Territories Future Climate Outlook")),
   absolutePanel(id="controls", top=20, right=-10, height=200, width=400,
     sliderInput("dec", "Decade", min=min(decades), max=max(decades), value=max(decades), step=10, sep="", post="s", width="100%"),
     wellPanel(
@@ -58,7 +56,9 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
           conditionalPanel("input.location !== null && input.location !== ''",
             actionButton("btn_modal_loc", "Community Insights", class="btn-block"))
       )
-    )
+    ),
+    sliderInput("lon_range", "Longitude", min=ext[1], max=ext[2], value=ext[1:2], step=1, sep="", post="°", width="100%"),
+    sliderInput("lat_range", "Latitude", min=ext[3], max=ext[4], value=ext[3:4], step=1, sep="", post="°", width="100%")
   ),
   absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=FALSE,
     plotOutput("sp_density_plot", width="100%", height="auto")
