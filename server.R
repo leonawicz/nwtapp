@@ -95,7 +95,6 @@ shinyServer(function(input, output, session) {
     if(!(p %in% models)){
       x <- filter(d, Var==Variable() & RCP==RCPs()) %>% group_by(Model, add=T) %>%
         mung_stats(Monthly(), mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), p)
-      return(x)
     }
 
     if(p %in% models){
