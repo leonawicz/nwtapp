@@ -157,8 +157,13 @@ shinyServer(function(input, output, session) {
 
   #### Map-related observers ####
   observe({ # raster layers
-    proxy <- leafletProxy("Map")
-    proxy %>% removeTiles(layerId="rasimg") %>% addRasterImage(ras(), colors=pal(), opacity=0.8, layerId="rasimg")
+    leafletProxy("Map") %>% removeTiles(layerId="rasimg") %>% addRasterImage(ras(), colors=pal(), opacity=0.8, layerId="rasimg")
+  })
+
+  observe({ # user-provided points
+    if(class(shp()$shp)=="SpatialPointsDataFrame")
+      leafletProxy("Map") %>% clearGroup("user_points") %>%
+        addCircleMarkers(data=shp()$shp, weight=2, radius=6, color="black", stroke=FALSE, fillOpacity=0.5, group="user_points")
   })
 
   observe({ # legend
