@@ -73,7 +73,7 @@ shpPoly <- function(input, output, session, r=NULL){
       if(cl=="SpatialPointsDataFrame"){
         d <- data.frame(shp()@coords, group=1)
         names(d) <- c("long", "lat", "group")
-      } else fortify(shp())
+      } else d <- fortify(shp())
       g <- ggplot(d, aes(x=long, y=lat, group=group)) + coord_equal() + theme_blank
       if(cl=="SpatialPolygonsDataFrame"){
         g <- g + geom_polygon(fill="steelblue4") + geom_path(colour="gray20")
@@ -106,7 +106,11 @@ shpPoly <- function(input, output, session, r=NULL){
 
   observe({
     if(!is.null(shp()) && tp()=="final"){
-      leafletProxy(ns("Map")) %>% clearShapes() %>% setView(lon(), lat(), zoom=2) %>% addPolygons(data=shp_wgs84(), weight=2)
+      cl <- class(shp_wgs84())
+      x <- leafletProxy(ns("Map")) %>% clearShapes() %>% clearMarkers() %>% setView(lon(), lat(), zoom=2)
+      if(cl=="SpatialPolygonsDataFrame") x %>% addPolygons(data=shp_wgs84(), weight=2)
+      if(cl=="SpatialLinesDataFrame") x %>% addPolylines(data=shp_wgs84(), weight=2)
+      if(cl=="SpatialPointsDataFrame") x %>% addCircleMarkers(data=shp_wgs84(), weight=2, radius=6)
     }
   })
 

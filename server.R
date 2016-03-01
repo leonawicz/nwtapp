@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
       if(cl=="SpatialPointsDataFrame"){
         d <- data.frame(shp()$shp_original@coords, group=1)
         names(d) <- c("long", "lat", "group")
-      } else fortify(shp()$shp_original)
+      } else d <- fortify(shp()$shp_original)
       g <- ggplot(d, aes(x=long, y=lat, group=group)) + coord_equal() + theme_blank
       if(cl=="SpatialPolygonsDataFrame"){
         g <- g + geom_polygon(fill="steelblue4") + geom_path(colour="gray20")
