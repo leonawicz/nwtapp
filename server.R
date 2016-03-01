@@ -72,7 +72,7 @@ shinyServer(function(input, output, session) {
 
   output$Mask_in_use <- renderUI({ if(is.null(shp())) h4("None") else plotOutput("Shp_Plot", height="auto") })
 
-  output$Shp_On <- renderUI({ if(!is.null(shp())) checkboxInput("shp_on", "Shapefile active", TRUE) })
+  output$Shp_On <- renderUI({ if(is.null(shp())) br() else checkboxInput("shp_on", "Shapefile active", TRUE) })
 
   # prepping GCM/CRU, raw/deltas, months/seasons, models/stats, temp/precip
   CRU_ras <- reactive({
@@ -129,6 +129,14 @@ shinyServer(function(input, output, session) {
   # store raster values once, separate from raster object
   ras_vals <- reactive({ values(ras()) })
 
+  output$dl_raster <- downloadHandler(
+    filename="rasterLayer.tif",
+    content=function(file){
+      rasfile <- writeRaster(ras(), file, format="GTiff", overwrite=TRUE)
+      file.rename(rasfile@file@name, file)
+    }
+  )
+
   # Colors and color palettes
   Colors <- reactive({
     req(input$colpal)
@@ -161,7 +169,7 @@ shinyServer(function(input, output, session) {
   })
 
   observe({ # user-provided points
-    if(class(shp()$shp)=="SpatialPointsDataFrame"){
+    if(class(shp()$shp)=="SpatialPointsDataFrame" & (!is.null(input$shp_on) && input$shp_on)){
       x <- shp()$shp@coords
       v <- raster::extract(ras(), x)
       x <- data.frame(x)
@@ -169,7 +177,7 @@ shinyServer(function(input, output, session) {
       x$clrs <- colorNumeric(Colors(), v, na.color="transparent")(v)
       leafletProxy("Map") %>% clearGroup("user_points") %>%
         addCircleMarkers(data=x, weight=1, radius=6, color=~clrs, stroke=TRUE, fillOpacity=0.8, group="user_points", layerId=paste0("user_points_", 1:nrow(x)))
-    }
+    } else leafletProxy("Map") %>% clearGroup("user_points")
   })
 
   observe({ # legend
