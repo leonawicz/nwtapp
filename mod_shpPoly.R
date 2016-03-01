@@ -70,10 +70,10 @@ shpPoly <- function(input, output, session, r=NULL){
   output$Shp_Plot <- renderPlot({
     if(!is.null(shp())){
       d <- fortify(shp())
-      ggplot(d, aes(x=long, y=lat, group=group)) +
-        geom_polygon(fill="steelblue4") + geom_polygon(data=filter(d, hole==TRUE), fill="white") +
-        geom_path(colour="gray20") + coord_equal() + theme_blank
+      g <- ggplot(d, aes(x=long, y=lat, group=group)) + geom_polygon(fill="steelblue4") + geom_path(colour="gray20") + coord_equal() + theme_blank
+      if("hole" %in% names(d)) g <- g + geom_polygon(data=filter(d, hole==TRUE), fill="white")
     }
+    g
   }, height=function() plot_ht())
   output$Map <- renderLeaflet({ leaflet() %>% setView(0, 0, zoom=2) %>% addTiles() })
   output$Map_Summary <- renderPrint({ req(shp_wgs84()); summary(shp_wgs84()) })

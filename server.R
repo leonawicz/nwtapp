@@ -44,10 +44,10 @@ shinyServer(function(input, output, session) {
   output$Shp_Plot <- renderPlot({
     if(!is.null(shp())){
       d <- fortify(shp()$shp_original)
-      ggplot(d, aes(x=long, y=lat, group=group)) +
-        geom_polygon(fill="steelblue4") + geom_polygon(data=filter(d, hole==TRUE), fill="white") +
-        geom_path(colour="gray20") + coord_equal() + theme_blank
+      g <- ggplot(d, aes(x=long, y=lat, group=group)) + geom_polygon(fill="steelblue4") + geom_path(colour="gray20") + coord_equal() + theme_blank
+      if("hole" %in% names(d)) g <- g + geom_polygon(data=filter(d, hole==TRUE), fill="white")
     }
+    g
   }, height=function() Shp_plot_ht(), bg="transparent")
 
   output$Mask_in_use <- renderUI({ if(is.null(shp())) h4("None") else plotOutput("Shp_Plot", height="auto") })
