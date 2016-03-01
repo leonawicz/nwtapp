@@ -71,9 +71,10 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
         column(3, h4("Mask:")),
         column(3, uiOutput("Mask_in_use"))
       )
-    )
+    ),
+    fluidRow(column(12, downloadButton("dl_raster", "Get Map (.tif)", class="btn-block")))
   ),
-  absolutePanel(id="controls", top=60, left=-20, height=300, width=300, draggable=FALSE,
+  absolutePanel(id="controls", top=60, left=-20, height=300, width=300,
     plotOutput("sp_density_plot", width="100%", height="auto")
   ),
   absolutePanel(bottom=10, left=10,
