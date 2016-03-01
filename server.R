@@ -17,9 +17,18 @@ shinyServer(function(input, output, session) {
   Extent <- reactive({
     x <- input$lon_range
     y <- input$lat_range
+    re <- extent(r)
     e <- extent(c(x, y))
-    if(is.null(raster::intersect(e, extent(r)))) e <- extent(r)
-    if(length(which(!is.na(crop(r, e)[]))) < 3) e <- extent(r)
+    if(is.null(raster::intersect(e, re))) return(re)
+    if(length(which(!is.na(crop(r, e)[]))) < 3) return(re)
+    if(!is.null(shp())){
+      e2 <- raster::intersect(e, extent(shp()$shp))
+      if(is.null(e2)){
+        return(re)
+      } else {
+        if(length(which(!is.na((crop(r, e2) %>% mask(shp()$shp))[]))) < 3) return(re)
+      }
+    }
     e
   })
 
