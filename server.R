@@ -161,9 +161,15 @@ shinyServer(function(input, output, session) {
   })
 
   observe({ # user-provided points
-    if(class(shp()$shp)=="SpatialPointsDataFrame")
+    if(class(shp()$shp)=="SpatialPointsDataFrame"){
+      x <- shp()$shp@coords
+      v <- raster::extract(ras(), x)
+      x <- data.frame(x)
+      names(x) <- c("lon", "lat")
+      x$clrs <- colorNumeric(Colors(), v, na.color="transparent")(v)
       leafletProxy("Map") %>% clearGroup("user_points") %>%
-        addCircleMarkers(data=shp()$shp, weight=2, radius=6, color="black", stroke=FALSE, fillOpacity=0.5, group="user_points")
+        addCircleMarkers(data=x, weight=1, radius=6, color=~clrs, stroke=TRUE, fillOpacity=0.8, group="user_points", layerId=paste0("user_points_", 1:nrow(x)))
+    }
   })
 
   observe({ # legend
@@ -189,7 +195,7 @@ shinyServer(function(input, output, session) {
     proxy <- leafletProxy("Map")
     if(p$id=="Selected"){
       proxy %>% removeMarker(layerId="Selected")
-    } else {
+    } else if(p$group=="locations") {
       proxy %>% setView(lng=p$lng, lat=p$lat, input$Map_zoom) %>% acm_defaults(p$lng, p$lat)
     }
   })
@@ -345,6 +351,8 @@ shinyServer(function(input, output, session) {
       addTooltip(session, "mod_or_stat", "Individual climate models or a statistic combining all five.", "left", options=list(container="body"))
       addTooltip(session, "location", "Enter a community. Menu filters as you type. Or select a community on map.", "left", options=list(container="body"))
       addTooltip(session, "deltas", "Display projected change from 1961-1990 baseline average instead of raw climate values.", "right", options=list(container="body"))
+      addTooltip(session, "show_communities", "Clickable locations reveal special app-provided community data.
+        These are different from map markers showing user-uploaded shapefile points.", "right", options=list(container="body"))
       addTooltip(session, "lat_range", "If cropped to a rectangle with insufficient data, the map will revert to its full extent.", "left", options=list(container="body"))
       addTooltip(session, "btn_modal_shp", "Upload a polygon shapefile for arbitrary masking.
         Once uploaded, the mask can be toggled on or off and may be combined with lon/lat sliders. Using a mask adds some delay.", "bottom", options=list(container="body"))
@@ -355,6 +363,7 @@ shinyServer(function(input, output, session) {
       removeTooltip(session, "mod_or_stat")
       removeTooltip(session, "location")
       removeTooltip(session, "deltas")
+      removeTooltip(session, "show_communities")
       removeTooltip(session, "lat_range")
       removeTooltip(session, "btn_modal_shp")
     }
