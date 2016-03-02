@@ -96,7 +96,10 @@ shpPoly <- function(input, output, session, r=NULL){
 
   output$Mask_Complete <- renderUI({
     if(!length(input$shp_file)) return(h4("No shapefile uploaded."))
-    if(is.null(shp())) return(HTML("<h4>Invalid file(s).</h4><h5>Upload all six required shapefile components:</h5><p><em>.shp, .dbf, .sbn, .sbx, .shx and .prj</em></p>"))
+    if(is.null(shp())) return(HTML(
+      "<h4>Invalid file(s).</h4><h5>Upload all required shapefile components:</h5>
+      <p><em>.dbf, .prj, .sbn, .sbx, .shp</em> and <em>.shx</em> for lines and polygons</p>
+      <p><em>.dbf, .prj, .shp</em> and <em>.shx</em> for points</p>"))
     if(!valid_proj()) return(h4("Shapefile is missing projection."))
     if(!valid_domain()) return(h4("Shapefile does not overlap map data."))
     if(!is.null(input$mask_btn) && input$mask_btn==0) return(h4("Shapefile loaded. Click to apply mask."))
