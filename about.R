@@ -8,10 +8,24 @@ about <- tabPanel("About",
     When viewing raw values, available maps consist of individual GCMs or maps which aggregate or compare those models.</p>
     <p style="text-align:justify">NT communities are also available. When viewing a community summary, a time series plot will appear highlighting trends for the community.
     Even though the maps are at a decadal resolution, community data is annual.
-    NT communities in the app are a small subset of those found in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts R app</a>.</p>'
+    NT communities in the app are a small subset of those found in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts R app</a>.</p>
+
+    <h4>Additional Features</h4>
+    <ul>
+    <li>Crop map extent using latitude and longitude sliders.</li>
+    <li>Upload a custom shapefile to mask map layer in a the upload window.</li>
+    <li>Visually confirm your original shapefile and reprojected (if applicable) shapefile on the map look right.</li>
+    <li>The uploader compares your shapefile with the app data to ensure validity.</li>
+    <li>Shapefiles may contain points, lines, or polygons.</li>
+    <li>Combine crop and mask operations.</li>
+    <li>Use the color swatches to select from common color palettes or create your own.</li>
+    <li>Download the displayed map as a geotiff.</li>
+    <li>Disable tooltips if you don\'t need them.</li>
+    </ul>
+    '
   ),
   HTML(
-    '<strong>Notes</strong>
+    '<h4>Notes</h4>
     <p></p>
     <p style="text-align:justify">RCP stands for Representative Concentration Pathways.
     RCPs 4.5, 6.0 and 8.5 cover a range of possible future climates based on atmospheric greenhouse gas concentrations.</p>
@@ -63,7 +77,7 @@ about <- tabPanel("About",
   ),
   fluidRow(
     column(4,
-      HTML('<strong>References</strong>
+      HTML('<h5>References</h5>
         <p></p>
         </ul>
         <li>Source code on <a href="https://github.com/ua-snap/shiny-apps/tree/master/ntwapp/" target="_blank">GitHub</a></li>
