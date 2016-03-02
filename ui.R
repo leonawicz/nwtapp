@@ -79,12 +79,13 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
   ),
   absolutePanel(bottom=10, left=10,
     conditionalPanel(is_gcm_string, checkboxInput("deltas", "Display deltas", FALSE)),
-    checkboxInput("show_communities", "Show communities", TRUE),
-    checkboxInput("show_extent", "Show/crop extent", FALSE),
-    checkboxInput("show_colpal", "Show color options", FALSE),
-    checkboxInput("legend", "Show legend", TRUE),
-    checkboxInput("ttips", "Show popup details", TRUE)
+    checkboxInput("show_communities", "Communities", TRUE),
+    checkboxInput("show_extent", "Crop/mask", FALSE),
+    checkboxInput("show_colpal", "Color options", FALSE),
+    checkboxInput("legend", "Legend", TRUE),
+    checkboxInput("ttips", "Tooltips", FALSE)
   ),
+  bsTooltip("ttips", "Toggle tooltips like this one for other app controls.", "right", options=list(container="body")),
   absolutePanel(id="controls", bottom=240, left=-10, height=190, width=320,
     conditionalPanel("input.show_colpal == true",
     wellPanel(
