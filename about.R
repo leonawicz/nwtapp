@@ -8,7 +8,7 @@ about <- tabPanel("About",
     When viewing raw values, available maps consist of individual GCMs or maps which aggregate or compare those models.</p>
     <p style="text-align:justify">NT communities are also available. When viewing a community summary, a time series plot will appear highlighting trends for the community.
     Even though the maps are at a decadal resolution, community data is annual.
-    NT communities in the app are a small subset of those found in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts R app</a>.</p>
+    NT communities in the app are a small subset of those found in the Alaska and western Canada <a href="https://uasnap.shinyapps.io/cc4liteFinal/">Community Charts R app</a>.</p>
 
     <h4>Additional Features</h4>
     <ul>
@@ -54,7 +54,7 @@ about <- tabPanel("About",
   bsModal("modal_help_locs", "Northwest Territories communities", "btn_help_locs", size="large",
     HTML('
       <p style="text-align:justify">The Northwest Territories communities in this app are a small subset of about 4,000 communities
-      in the Alaska and western Canada <a href="http://shiny.snap.uaf.edu/cc4liteFinal/">Community Charts app</a>.
+      in the Alaska and western Canada <a href="https://uasnap.shinyapps.io/cc4liteFinal/">Community Charts app</a>.
       Communities are not truly point data, e.g., weather station data.
       Rather, they are based on SNAP\'s downscaled climate data sets and a "community" refers to the <em>grid cell</em> which contains a community\'s coordinates.</p>
 
