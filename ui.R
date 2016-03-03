@@ -10,6 +10,7 @@ shinyUI(navbarPage(theme="http://bootswatch.com/spacelab/bootstrap.css", inverse
   collapsible=TRUE,
   id="nb",
   tabPanel("Climate", value="vis",
+  tags$head(includeScript("google-analytics.js"))
   shpPolyInput("user_shapefile", "Upload polygon shapefile", "btn_modal_shp"),
   bsModal("modal_loc", "Community Insights", "btn_modal_loc", size = "large",
     fluidRow(
