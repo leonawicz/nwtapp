@@ -87,15 +87,15 @@ shinyServer(function(input, output, session) {
 
     mung_models <- function(x, monthly, mo, dec, mo2, f_sea){
       if(monthly){
-        x[[mo]] %>% subset(dec)
+        subset(x[[dec]], mo) %>% crop(Extent())
       } else {
-        calc(brick(lapply(x[mo2], function(x, idx, e) subset(x, idx) %>% crop(e), idx=dec, e=Extent())), f_sea) %>% round(1)
+        calc(subset(x[[dec]], mo2) %>% crop(Extent()), f_sea) %>% round(1)
       }
     }
 
     mung_stats <- function(x, monthly, mo, dec, mo2, f_sea, f_stat, statid){
       if(!monthly) mo <- mo2
-      x <- x %>% do(., Maps=.$Maps[[1]][mo] %>% purrr::map(~subset(.x, dec)) %>% brick %>% crop(Extent()) %>% calc(f_sea))
+      x <- x %>% do(., Maps=subset(.$Maps[[1]][[dec]], mo) %>% crop(Extent()) %>% calc(f_sea))
       x <- f_stat(brick(x$Maps))
       if(statid=="Spread") x <- calc(x, function(x) x[2]-x[1])
       round(x, 1)
