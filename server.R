@@ -9,10 +9,23 @@ shinyServer(function(input, output, session) {
   Monthly <- reactive({ input$toy %in% month.abb })
   Mos <- reactive({ if(Monthly()) input$toy else month.abb[sea.idx[[input$toy]]] })
   mon_index <- reactive({ match(Mos(), month.abb) })
-
   Variable <- reactive({ vars[var.labels==input$variable] })
-
   RCPs <- reactive({ rcps[rcp.labels==input$rcp] })
+
+  dt_maps_file <- reactive({
+    req(Variable(), RCPs(), input$dec)
+    paste0("map_subtables/", Variable(),"_",RCPs(), "_", input$dec, ".RData")
+  })
+
+  rv <- reactiveValues()
+
+  load_file <- function(file){
+    load(file[1], envir=environment())
+    rv[["d"]] <- d
+  }
+
+  updateData <- reactive({ load_file(dt_maps_file()) })
+  observe({ updateData() })
 
   Extent <- reactive({
     x <- input$lon_range
@@ -81,41 +94,24 @@ shinyServer(function(input, output, session) {
   })
 
   ras <- reactive({
-    dec.idx <- which(decades==input$dec)
+    #dec.idx <- seq_along(unique(rv$d$Decade)) #which(decades==input$dec)
     mon.idx <- switch(input$toy, Winter=c(1,2,12), Spring=3:5, Summer=6:8, Fall=9:11)
+    mo <- if(Monthly()) mon_index() else mon.idx
     p <- input$mod_or_stat
-
-    mung_models <- function(x, monthly, mo, dec, mo2, f_sea){
-      if(monthly){
-        subset(x[[dec]], mo) %>% crop(Extent())
-      } else {
-        calc(subset(x[[dec]], mo2) %>% crop(Extent()), f_sea) %>% round(1)
-      }
-    }
-
-    mung_stats <- function(x, monthly, mo, dec, mo2, f_sea, f_stat, statid){
-      if(!monthly) mo <- mo2
-      x <- x %>% do(., Maps=subset(.$Maps[[1]][[dec]], mo) %>% crop(Extent()) %>% calc(f_sea))
-      x <- f_stat(brick(x$Maps))
-      if(statid=="Spread") x <- calc(x, function(x) x[2]-x[1])
-      round(x, 1)
-    }
-
-    if(!(p %in% models)){
-      x <- filter(d, Var==Variable() & RCP==RCPs()) %>% group_by(Model, add=T) %>%
-        mung_stats(Monthly(), mon_index(), dec.idx, mon.idx, sea_func(), stat_func(), p)
-    }
-
     if(p %in% models){
-      x <- filter(d, Var==Variable() & RCP==RCPs() & Model==p)$Maps[[1]]
-      x <- mung_models(x, Monthly(), mon_index(), dec.idx, mon.idx, sea_func())
+      x <- filter(rv$d, Model==p)$Maps[[1]][[1]] %>% subset(mo) %>% crop(Extent())
+      if(!Monthly()) x <- calc(x, sea_func()) %>% round(1)
       if(input$deltas & Variable()=="pr"){
         x <- round(x / CRU_ras(), 2)
         x[is.infinite(x)] <- NA
       }
       if(input$deltas & Variable()=="tas") x <- x - CRU_ras()
+    } else {
+      x <- group_by(rv$d, Model, add=T) %>% do(., Maps=subset(.$Maps[[1]][[1]], mo) %>% crop(Extent()) %>% calc(sea_func()))
+      x <- stat_func()(brick(x$Maps))
+      if(p=="Spread") x <- calc(x, function(x) x[2]-x[1])
+      x <- round(x, 1)
     }
-
     if(!is.null(shp()) && (is.null(input$shp_on) || input$shp_on)){
       if(!is.null(raster::intersect(extent(x), extent(shp()$shp)))){
         x.masked <- try(crop(x, shp()$shp) %>% mask(shp()$shp), TRUE)
@@ -235,12 +231,10 @@ shinyServer(function(input, output, session) {
   Loc_RCPs <- reactive({ rcps[rcp.labels==input$loc_rcp] })
 
   Data <- reactive({
-    x <- select(d, Var, RCP, Model, Locs) %>% group_by(RCP, Model, Var) %>%
-      filter(Var==Loc_Var() & RCP==Loc_RCPs()) %>%
-      arrange(Var, RCP, Model) %>%
-      do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest
-
-    x <- group_by(d.cru, Var) %>% do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest %>%
+    x <- filter(d.gcm, Var==Loc_Var() & RCP==Loc_RCPs()) %>% do(
+      Locs=.$Locs[[1]] %>% purrr::map2(month.abb, ~mutate(.x, Month=factor(.y, levels=month.abb))) %>%
+        bind_rows %>% filter(Location==input$location)) %>% unnest
+    x <- d.cru %>% do(Locs=filter(.$Locs[[1]], Location==input$location)) %>% unnest %>%
       filter(Var==Loc_Var()) %>% mutate(RCP="historical", Model="CRU 3.2") %>% bind_rows(x) %>%
       select(Location, Var, RCP, Model, Year, Month, value) %>%
       mutate(Model=factor(Model, levels=unique(Model))) %>%
